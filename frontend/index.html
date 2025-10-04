@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent - Grant Intelligence Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chat-bubble {
+            @apply rounded-lg px-4 py-3 max-w-xs lg:max-w-md;
+        }
+        .chat-input {
+            @apply border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Simple Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 p-4">
+        <div class="max-w-4xl mx-auto flex items-center space-x-3">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-robot text-white text-sm"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-800">AI Grant Assistant</h1>
+                <p class="text-sm text-gray-500">Ask me about grants and sales strategy</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chat Container -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col">
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <!-- Welcome Message -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 max-w-2xl">
+                        <p class="text-gray-800 text-sm leading-relaxed">Hello! I'm your AI Grant Intelligence Assistant. I can help you with grant discovery, eligibility checking, sales strategies, and more. What would you like to know?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="border-t border-gray-200 p-6">
+                <div class="flex space-x-3">
+                    <input
+                        type="text"
+                        id="chat-input"
+                        class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Type your message..."
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button
+                        id="send-button"
+                        onclick="sendMessage()"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Send</span>
+                    </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let conversationId = null;
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function setQuickQuestion(question) {
+            document.getElementById('chat-input').value = question;
+            document.getElementById('chat-input').focus();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage('user', message);
+            input.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversation_id: conversationId
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get response');
+                }
+
+                const data = await response.json();
+                conversationId = data.conversation_id;
+
+                // Remove typing indicator and add bot response
+                removeTypingIndicator();
+                addMessage('bot', data.response);
+
+            } catch (error) {
+                console.error('Error:', error);
+                removeTypingIndicator();
+                addMessage('bot', 'Sorry, I encountered an error. Please try again.');
+            }
+        }
+
+        function formatAIResponse(text) {
+            // If already contains HTML, return as is
+            if (text.includes('<h3>') || text.includes('<p>') || text.includes('<ol>') || text.includes('<ul>')) {
+                return text;
+            }
+
+            // Format numbered lists
+            if (text.includes('1.') || text.includes('2.') || text.includes('3.')) {
+                let formatted = '<h3>Available Grant Options</h3><ol>';
+
+                // Split by double newlines for sections
+                let sections = text.split(/\n\s*\n/);
+
+                sections.forEach(section => {
+                    if (section.trim()) {
+                        let lines = section.split('\n');
+                        lines.forEach(line => {
+                            let match = line.match(/^(\d+)\.\s*\*\*(.*?)\*\*(?:\s*:)?\s*(.*)/);
+                            if (match) {
+                                formatted += `<li><strong>${match[2]}</strong>: ${match[3]}</li>`;
+                            } else {
+                                match = line.match(/^(\d+)\.\s*(.*)/);
+                                if (match) {
+                                    formatted += `<li>${match[2]}</li>`;
+                                }
+                            }
+                        });
+                    }
+                });
+
+                formatted += '</ol>';
+                return formatted;
+            }
+
+            // Default paragraph formatting
+            return `<p>${text.replace(/\n/g, '</p><p>')}</p>`;
+        }
+
+        function addMessage(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-start space-x-3 ${sender === 'user' ? 'justify-end' : ''}`;
+
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="chat-bubble bg-blue-600 text-white ml-auto">
+                        <p>${message}</p>
+                    </div>
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-gray-600 text-sm"></i>
+                    </div>
+                `;
+            } else {
+                // Format bot messages for better readability
+                const formattedMessage = sender === 'bot' ? formatAIResponse(message) : message;
+
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 max-w-2xl">
+                        <div class="text-gray-800 text-sm leading-relaxed">${formattedMessage}</div>
+                    </div>
+                `;
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'flex items-start space-x-3';
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-white text-sm"></i>
+                </div>
+                <div class="chat-bubble bg-white border border-gray-200">
+                    <div class="flex space-x-1">
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Auto-focus input on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('chat-input').focus();
+        });
+    </script>
+</body>
+</html>
