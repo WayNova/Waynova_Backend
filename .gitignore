@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+
+# Virtual Environments
+.venv/
+venv/
+
+# Data files (if you don't want raw data on GitHub)
+data/
+
+# VS Code or PyCharm config (optional)
+.vscode/
+.idea/

@@ -1,10 +1,23 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from models import SalesRepDropdownInput, GrantMatch
 from data_loader import buyer_indexer, grant_indexer
 from match_engine import get_ranked_matches_cosine
+from auth.routes import router as auth_router
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth_router)
 
 @app.on_event("startup")
 async def load_data():
