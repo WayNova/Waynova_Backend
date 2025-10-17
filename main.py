@@ -21,8 +21,8 @@ app.include_router(auth_router)
 
 @app.on_event("startup")
 async def load_data():
-    buyer_indexer.load_buyers("data/buyer_profiles_real.csv")
-    grant_indexer.load_grants("data/Cal_Grants.csv")
+    buyer_indexer.load_buyers("/Users/sanyamjain/Desktop/waynova/data/buyer_profiles_real.csv")
+    grant_indexer.load_grants("/Users/sanyamjain/Desktop/waynova/data/Cal_Grants.csv")
 
 @app.post("/match", response_model=List[GrantMatch])
 def match_grants(rep_input: SalesRepDropdownInput):
