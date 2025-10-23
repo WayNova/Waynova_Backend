@@ -18,6 +18,72 @@
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+        
+        /* Professional Grant Response Styling */
+        .grant-response h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3b82f6;
+        }
+        
+        .grant-response h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .grant-response p {
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+        
+        .grant-response ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0.5rem 0;
+        }
+        
+        .grant-response ul li {
+            padding: 0.35rem 0;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+        
+        .grant-response ul li strong {
+            color: #1f2937;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 140px;
+        }
+        
+        .grant-response ol {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .grant-response ol li {
+            padding: 0.25rem 0;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+        
+        .grant-item {
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.375rem;
+        }
+        
+        .bot-message-content {
+            max-width: 100% !important;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -28,8 +94,8 @@
                 <i class="fas fa-robot text-white text-sm"></i>
             </div>
             <div>
-                <h1 class="text-xl font-semibold text-gray-800">AI Grant Assistant</h1>
-                <p class="text-sm text-gray-500">Ask me about grants and sales strategy</p>
+                <h1 class="text-xl font-semibold text-gray-800">Public Grants Intelligence Assistant</h1>
+                <p class="text-sm text-gray-500">Expert guidance on federal, state & private grants across all sectors</p>
             </div>
         </div>
     </header>
@@ -45,7 +111,17 @@
                         <i class="fas fa-robot text-white text-sm"></i>
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 max-w-2xl">
-                        <p class="text-gray-800 text-sm leading-relaxed">Hello! I'm your AI Grant Intelligence Assistant. I can help you with grant discovery, eligibility checking, sales strategies, and more. What would you like to know?</p>
+                        <p class="text-gray-800 text-sm leading-relaxed">👋 <strong>Welcome to Public Grants Intelligence!</strong></p>
+                        <p class="text-gray-700 text-sm leading-relaxed mt-2">I'm your expert consultant with comprehensive knowledge of public grants across all sectors including:</p>
+                        <ul class="text-gray-700 text-sm mt-2 ml-4 space-y-1">
+                            <li>🏥 Healthcare & Medical Services</li>
+                            <li>🚒 Emergency Medical Services (EMS) & Fire</li>
+                            <li>👮 Law Enforcement & Public Safety</li>
+                            <li>📚 Education & Youth Programs</li>
+                            <li>🏗️ Infrastructure & Transportation</li>
+                            <li>🌱 Environmental & Energy</li>
+                        </ul>
+                        <p class="text-gray-700 text-sm leading-relaxed mt-3">Ask me about specific grants, eligibility requirements, or get recommendations for your organization!</p>
                     </div>
                 </div>
             </div>
@@ -189,8 +265,8 @@
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-robot text-white text-sm"></i>
                     </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 max-w-2xl">
-                        <div class="text-gray-800 text-sm leading-relaxed">${formattedMessage}</div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 bot-message-content" style="max-width: 90%;">
+                        <div class="text-gray-800 text-sm leading-relaxed grant-response">${formattedMessage}</div>
                     </div>
                 `;
             }
